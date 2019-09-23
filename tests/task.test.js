@@ -41,9 +41,11 @@ test('Tasks for userOne', async () => {
 })
 
 test('User One Should not detele any tasks of user Two', async () => {
-    await request(app)
+    const response = await request(app)
         .delete(`/tasks/${taskOne._id}`) // task 2 was owned by user 2
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`) // authorized user one
         .send()
         .expect(404)
+    const task = await Task.findById(taskOne._id)
+    expect(task).not.toBeNull()
 })
