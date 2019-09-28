@@ -117,3 +117,47 @@ test('Should not update invalid user fileds', async () => {
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
         .expect(400)
 })
+
+//
+// User Test Ideas
+//
+// Should not signup user with invalid name/email/password
+test('Should not signup user with invalid name/email/password', async () => {
+    await request(app).post('/users').send({
+        name: 'Another user whose info is invalid',
+        email: 'vdh@gmail.com',
+        password: '1'
+    }).expect(400)
+})
+// Should not update user if unauthenticated
+test('Should not update user if unauthenticated', async () => {
+    await request(app)
+        .patch('/users/me')
+        //.set('Authorization', 'Bearer 124aslkdj')
+        .send({
+            name: 'Hung',
+            email: 'vdh@ee.com'
+        })
+        .expect(401) // Unauthorized
+    const user = await User.findOne({ email: 'vdh@ee.com' })
+    expect(user).toBeNull()
+})
+// Should not update user with invalid name/email/password
+test('Should not update user with invalid name/email/password', async () => {
+    await request(app)
+        .patch('/users/me')
+        .send({
+            email: 'vdh@.com',
+            password: 'Red@123*()'
+        })
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .expect(400)
+})
+// Should not delete user if unauthenticated
+test('Should not delete user if not authenticated', async () => {
+    await request(app)
+        .delete('/users/me')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send()
+        .expect(401)
+})
